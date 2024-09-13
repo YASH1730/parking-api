@@ -35,6 +35,25 @@ async function register(req, res) {
     return res.status(500).send({ success: false, message: "Internal Server Error", data: error });
   }
 }
+// addDetails function to create a new user
+async function addDetails(req, res) {
+  try {
+    let { userName, mobile, email, vehicle_no } = req.body;
+
+    const response = await db("users").update({
+      name: userName,
+      mobile,
+      email
+    }).where('vehicle_no',vehicle_no);
+
+    if (response)
+      return res.status(200).send({ status: 200, message: "Registration Completed." });
+
+  } catch (error) {
+    console.log("Error while calling Register API", error);
+    return res.status(500).send({ success: false, message: "Internal Server Error", data: error });
+  }
+}
 
 // Login function to authenticate a user
 async function login(req, res) {
@@ -52,6 +71,7 @@ async function login(req, res) {
       .select([
         "password",
         "name",
+        "email",
         "mobile",
         "vehicle",
         "vehicle_no",
@@ -86,4 +106,5 @@ async function login(req, res) {
 module.exports = {
   register,
   login,
+  addDetails
 };
