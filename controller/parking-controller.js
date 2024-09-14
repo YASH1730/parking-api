@@ -1,8 +1,7 @@
-require('dotenv').config();
+require("dotenv").config();
 const db = require("../connection/conn");
 const axios = require("axios");
 const admin = require("firebase-admin");
-
 
 async function addParking(req, res) {
   try {
@@ -15,15 +14,15 @@ async function addParking(req, res) {
       district,
       vehicle_no,
       new_vehicle,
-      list
+      list,
     } = req.body;
 
     let { vehicle_no: user_vehicle_no, name } = req.user;
 
     // If a new vehicle number is entered, append it to the vehicle list in the user table
     if (!new_vehicle) {
-      await db('users')
-        .where('vehicle_no', user_vehicle_no)
+      await db("users")
+        .where("vehicle_no", user_vehicle_no)
         .update({ vehicle: JSON.stringify([...list, vehicle_no]) });
     }
 
@@ -55,10 +54,10 @@ async function addParking(req, res) {
       ...location,
     });
 
-    // This code works for sending notifications to all other users 
+    // This code works for sending notifications to all other users
     // let tokens = await db("notify_token").select('token').whereNot('vehicle_no', user_vehicle_no);
     // tokens = tokens.map(row => row.token);
-    // Notify all others about the new parking 
+    // Notify all others about the new parking
     // const payload = {
     //   notification: { title: `${name} added a new parking.`, body: formatted_address }
     // };
@@ -73,7 +72,9 @@ async function addParking(req, res) {
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong!" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong!" });
   }
 }
 
@@ -108,7 +109,9 @@ async function updateParking(req, res) {
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong!" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong!" });
   }
 }
 
@@ -164,7 +167,9 @@ async function getAllParking(req, res) {
       });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong!" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong!" });
   }
 }
 
@@ -196,13 +201,16 @@ async function getAllCoordinates(req, res) {
           `ST_Distance_Sphere(point(parking.longitude, parking.latitude), point(?, ?)) <= ?`,
           [longitude, latitude, range]
         );
-      }).first();
+      })
+      .first();
 
     data = data ? [data] : [];
 
     if (!data.length) {
       console.log(range, " :: Request End No Parking found");
-      return res.status(200).send({ status: 200, message: "No parking", data: [], total: 0 });
+      return res
+        .status(200)
+        .send({ status: 200, message: "No parking", data: [], total: 0 });
     }
 
     let bookingIds = [];
@@ -237,7 +245,9 @@ async function getAllCoordinates(req, res) {
 
     if (!bookingIds.length) {
       console.log(range, " :: Request End By booking IDs");
-      return res.status(200).send({ status: 200, message: "No parking", data: [], total: 0 });
+      return res
+        .status(200)
+        .send({ status: 200, message: "No parking", data: [], total: 0 });
     }
 
     let timeout = setTimeout(async () => {
@@ -249,7 +259,9 @@ async function getAllCoordinates(req, res) {
           .del();
       });
       clearInterval(intervalID);
-      return res.status(200).send({ status: 200, message: "No parking", data: [], total: 0 });
+      return res
+        .status(200)
+        .send({ status: 200, message: "No parking", data: [], total: 0 });
     }, 40000);
 
     // Check if the request is accepted by users every 10 seconds
@@ -285,7 +297,9 @@ async function getAllCoordinates(req, res) {
     }, 10000);
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong!" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong!" });
   }
 }
 
@@ -446,7 +460,9 @@ async function getBookingHistory(req, res) {
       });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong !" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong !" });
   }
 }
 
@@ -474,7 +490,9 @@ async function getParkingDetails(req, res) {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong !" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong !" });
   }
 }
 
@@ -496,10 +514,14 @@ async function releaseParking(req, res) {
       .where("id", HID);
 
     if (parking && request)
-      return res.status(200).send({ status: 200, message: "Parking released successfully." });
+      return res
+        .status(200)
+        .send({ status: 200, message: "Parking released successfully." });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong !" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong !" });
   }
 }
 
@@ -517,13 +539,16 @@ async function reachedParking(req, res) {
       .where("id", HID);
 
     if (request)
-      return res.status(200).send({ status: 200, message: "Parking updated to reached." });
+      return res
+        .status(200)
+        .send({ status: 200, message: "Parking updated to reached." });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ status: 500, message: "Something Went Wrong !" });
+    return res
+      .status(500)
+      .send({ status: 500, message: "Something Went Wrong !" });
   }
 }
-
 
 async function placeBooking(req, res) {
   try {
@@ -549,14 +574,16 @@ async function placeBooking(req, res) {
         id: check[0]?.id,
       });
 
+    let own_vehicle_no = await db('parking').select('vehicle_no').where('id',id).first();  
+    own_vehicle_no = own_vehicle_no.vehicle_no
     // Now add the book in booking table
     let save = await db("request_queue").insert({
       parking_id: id,
       lender_vehicle_no: vehicle_no,
       lender_name: name,
-      status: 'Approved', // for automatic approval 
-      own_loc, // for automatic approval 
-      own_vehicle_no: vehicle_no || 'Not provided'
+      status: "Approved", // for automatic approval
+      own_loc, // for automatic approval
+      own_vehicle_no,
     });
 
     if (!save)
@@ -577,12 +604,13 @@ async function getRequests(req, res) {
   try {
     let { offset, search } = req.query;
     let { vehicle_no } = req.user;
+    console.log(vehicle_no) 
 
     let total = await db
       .select(db.raw("COUNT(*) OVER () as total"))
       .from("request_queue")
       .innerJoin("parking", "request_queue.parking_id", "parking.id")
-      .where("parking.user_vehicle_no", vehicle_no);
+      .where("request_queue.own_vehicle_no", vehicle_no)
     let data = await db
       .select(
         "request_queue.*",
@@ -596,15 +624,7 @@ async function getRequests(req, res) {
       )
       .from("request_queue")
       .innerJoin("parking", "request_queue.parking_id", "parking.id")
-      .where((sb) => {
-        sb.where("request_queue.lender_vehicle_no", vehicle_no);
-        sb.orWhere("parking.user_vehicle_no", vehicle_no);
-        if (search) {
-          sb.whereILike("parking.city", `${search}%`);
-          sb.orWhereILike("parking.state", `${search}%`);
-          sb.orWhereILike("parking.address", `${search}%`);
-        }
-      })
+      .where("request_queue.own_vehicle_no", vehicle_no)
       .orderBy("request_queue.created_at", "desc")
       .offset(offset)
       .limit(10);
@@ -687,7 +707,9 @@ async function approveRequest(req, res) {
     await db("parking").update("current_status", "Booked").where("id", PID);
 
     if (updateRequest)
-      return res.status(200).send({ status: 200, message: "Request Approved." });
+      return res
+        .status(200)
+        .send({ status: 200, message: "Request Approved." });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: "Something Went Wrong !" });
@@ -712,6 +734,5 @@ module.exports = {
   getParking,
   getuserParking,
   addParkingRequest,
-  reachedParking
+  reachedParking,
 };
-

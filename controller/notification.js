@@ -3,8 +3,8 @@ const db = require("../connection/conn");
 
 exports.sendNotification = async (req, res) => {
   try {
-    const { title, body, recipient_vehicle_no, vehicle_no } = req.body;
-    // const { vehicle_no } = req.user;
+    const { title, body, recipient_vehicle_no } = req.body;
+    const { vehicle_no } = req.user;
     console.log(req.body)
 
     if (!recipient_vehicle_no || !vehicle_no || !title || !body) {
