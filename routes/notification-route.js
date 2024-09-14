@@ -3,7 +3,8 @@ const {Auth} = require("../middleware/auth.js");
 
 const route = require('express').Router();
 
-route.post('/send',Auth,sendNotification);
+// route.post('/send',Auth,sendNotification);
+route.post('/send',sendNotification);
 
 route.post('/saveToken',Auth,saveToken);
 

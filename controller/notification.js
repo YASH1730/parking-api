@@ -3,8 +3,9 @@ const db = require("../connection/conn");
 
 exports.sendNotification = async (req, res) => {
   try {
-    const { title, body, recipient_vehicle_no } = req.body;
-    const { vehicle_no } = req.user;
+    const { title, body, recipient_vehicle_no, vehicle_no } = req.body;
+    // const { vehicle_no } = req.user;
+    console.log(req.body)
 
     if (!recipient_vehicle_no || !vehicle_no || !title || !body) {
       return res.status(203).send({
@@ -17,6 +18,8 @@ exports.sendNotification = async (req, res) => {
     let registrationTokens = await db("notify_token")
       .select("token")
       .where("vehicle_no", recipient_vehicle_no);
+
+      console.log(registrationTokens)
 
     // If user is not logged in, save the notification
     if (!registrationTokens.length) {
@@ -32,9 +35,24 @@ exports.sendNotification = async (req, res) => {
     }
 
     registrationTokens = registrationTokens.map(row => row.token);
-    const notification = { notification: { title, body } };
-
-    await admin.messaging().sendToDevice(registrationTokens, notification);
+    const notification = {
+      notification: {
+        title,
+        body,
+      }
+    };
+    
+    // Prepare the message payload
+    const message = {
+      notification: {
+        title: title,
+        body: body
+      },
+      tokens: registrationTokens 
+    };
+    const response = await admin.messaging().sendEachForMulticast(message);
+  
+  console.log(JSON.stringify(response));
 
     return res
       .status(200)
