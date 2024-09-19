@@ -576,6 +576,7 @@ async function placeBooking(req, res) {
 
     let own_vehicle_no = await db('parking').select('vehicle_no').where('id',id).first();  
     own_vehicle_no = own_vehicle_no.vehicle_no
+
     // Now add the book in booking table
     let save = await db("request_queue").insert({
       parking_id: id,
@@ -610,7 +611,8 @@ async function getRequests(req, res) {
       .select(db.raw("COUNT(*) OVER () as total"))
       .from("request_queue")
       .innerJoin("parking", "request_queue.parking_id", "parking.id")
-      .where("request_queue.own_vehicle_no", vehicle_no)
+      .where("request_queue.own_vehicle_no", vehicle_no);
+
     let data = await db
       .select(
         "request_queue.*",
