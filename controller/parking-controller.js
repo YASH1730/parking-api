@@ -196,7 +196,9 @@ async function getAllCoordinates(req, res) {
       .innerJoin("users", "parking.user_vehicle_no", "users.vehicle_no")
       .andWhere((sb) => {
         sb.whereNot("parking.user_vehicle_no", vehicle_no);
-        sb.andWhere("parking.current_status", "Free");
+        sb.andWhereNot("parking.current_status", "Released");
+        sb.andWhereNot("parking.current_status", "Approved");
+        sb.andWhereNot("parking.current_status", "Pending");
         sb.whereRaw(
           `ST_Distance_Sphere(point(parking.longitude, parking.latitude), point(?, ?)) <= ?`,
           [longitude, latitude, range]
