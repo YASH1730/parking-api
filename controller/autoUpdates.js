@@ -7,7 +7,7 @@ const moment = require("moment");
 cron.schedule("*/5 * * * *", () => {
   updateParking();
 });
-
+updateParking()
 async function updateParking() {
   try {
     // console.log("Checking Started");
@@ -18,24 +18,28 @@ async function updateParking() {
     const todayEnd = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
 
     let data = await db("request_queue")
-      .select("id")
-      .where(function () {
-        this.where("updated_at", "<=", currentTime)
-          .andWhere("updated_at", ">=", todayStart)
-          .andWhere("updated_at", "<=", todayEnd)
-          .andWhere('status', 'Approved');
-      });
-
-    if (data.length === 0) {
-      // console.log("Checking Ended with ", data.length);
+    .select("id", "parking_id")
+    .where(function () {
+      this.whereBetween("updated_at", [todayStart, todayEnd])
+        .andWhere("status", "Approved");
+    });
+  
+    if (!data.length) {
+      console.log("Checking Ended with ", data);
       return 0;
     }
 
-    data = data.map((row) => row.id);
-    console.log(data);
+    const parking_ids = data.map(row=>row.parking_id);
+    const ids = data.map(row=>row.id);
+    console.log(">>",parking_ids
+      ,ids)
+
     // update the status on parking to from Approved to Released
+    await db("parking")
+      .whereIn("id", parking_ids)
+      .update({ current_status: "Released" });
     await db("request_queue")
-      .whereIn("id", data)
+      .whereIn("id", ids)
       .update({ status: "Released" });
 
     // console.log("Checking Ended with ", data.length);
