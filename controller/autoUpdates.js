@@ -7,7 +7,6 @@ const moment = require("moment");
 cron.schedule("*/5 * * * *", () => {
   updateParking();
 });
-updateParking()
 async function updateParking() {
   try {
     // console.log("Checking Started");

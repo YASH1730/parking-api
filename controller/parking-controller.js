@@ -569,6 +569,10 @@ async function placeBooking(req, res) {
       .andWhere("lender_vehicle_no", vehicle_no)
       .andWhere("status", "Pending");
 
+      await db("parking")
+      .where("id", id)
+      .update({ current_status: "Released" });
+
     if (check.length)
       return res.status(200).send({
         status: 200,
